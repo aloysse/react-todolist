@@ -1,32 +1,36 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import SideImage from "./components/SideImage.js";
+import { useAuth } from "./components/Context.js";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const { token, setToken, API_URL } = useAuth();
+
+  const onSubmit = (data) => {
+    /*登入post*/
+    fetch(API_URL + "users/sign_in", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: data }),
+    })
+      .then((res) => {
+        setToken(res.headers.get("authorization"));
+      })
+      .then((data) => navigate("/todo-list"))
+      .catch((error) => console.error(error));
+  };
 
   return (
     <div id="loginPage" className="bg-yellow">
       <div className="conatiner loginPage vhContainer ">
-        <div className="side">
-          <a href="#!">
-            <img
-              className="logoImg"
-              src="https://upload.cc/i1/2022/03/23/rhefZ3.png"
-              alt=""
-            />
-          </a>
-          <img
-            className="d-m-n"
-            src="https://upload.cc/i1/2022/03/23/tj3Bdk.png"
-            alt="workImg"
-          />
-        </div>
+        <SideImage />
         <div>
           <form className="formControls" onSubmit={handleSubmit(onSubmit)}>
             <h2 className="formControls_txt">最實用的線上代辦事項服務</h2>

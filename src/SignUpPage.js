@@ -1,7 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import SideImage from "./components/SideImage.js";
+import { useAuth } from "./components/Context.js";
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
+  const { token, setToken, API_URL } = useAuth();
+
   const {
     watch,
     register,
@@ -10,33 +15,41 @@ const SignUpPage = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    const newData = {
+      email: data.email,
+      nickname: data.nickname,
+      password: data.password,
+    };
+    /*post 註冊資料*/
+    fetch(API_URL + "users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user: newData }),
+    })
+      .then((response) => {
+        setToken(response.headers.get("authorization"));
+        console.log(token);
+        //Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjciLCJzY3AiOiJ1c2VyIiwiYXVkIjpudWxsLCJpYXQiOjE2NjE4NDM4NDMsImV4cCI6MTY2MzEzOTg0MywianRpIjoiOTJmMjBlNzEtNTE2ZC00MTUzLTg3ZmMtNDk2MDExMDc5NWYwIn0.4dgHvi1djjPDfRs2zm1qBktW7f6m8ieYFSTtGmS8MoU
+        return response.json();
+      })
+      .then((data) => alert(data.message))
+      .then((data) => navigate("/todo-list"))
+      .catch((error) => console.error(error));
+  };
 
   return (
-    <div id="signUpPage" class="bg-yellow">
-      <div class="conatiner signUpPage vhContainer">
-        <div class="side">
-          <a href="#!">
-            <img
-              class="logoImg"
-              src="https://upload.cc/i1/2022/03/23/rhefZ3.png"
-              alt=""
-            />
-          </a>
-          <img
-            class="d-m-n"
-            src="https://upload.cc/i1/2022/03/23/tj3Bdk.png"
-            alt="workImg"
-          />
-        </div>
+    <div id="signUpPage" className="bg-yellow">
+      <div className="conatiner signUpPage vhContainer">
+        <SideImage />
         <div>
-          <form class="formControls" onSubmit={handleSubmit(onSubmit)}>
-            <h2 class="formControls_txt">註冊帳號</h2>
-            <label class="formControls_label" for="email">
+          <form className="formControls" onSubmit={handleSubmit(onSubmit)}>
+            <h2 className="formControls_txt">註冊帳號</h2>
+            <label className="formControls_label" for="email">
               Email
             </label>
             <input
-              class="formControls_input"
+              className="formControls_input"
               type="text"
               id="email"
               name="email"
@@ -50,25 +63,25 @@ const SignUpPage = () => {
               })}
             />
             <span>{errors.email?.message}</span>
-            <label class="formControls_label" for="name">
+            <label className="formControls_label" for="nickname">
               您的暱稱
             </label>
             <input
-              class="formControls_input"
+              className="formControls_input"
               type="text"
-              name="name"
-              id="name"
+              name="nickname"
+              id="nickname"
               placeholder="請輸入您的暱稱"
-              {...register("name", {
+              {...register("nickname", {
                 required: { value: true, message: "此欄位不可留空" },
               })}
             />
-            <span>{errors.name?.message}</span>
-            <label class="formControls_label" for="pwd">
+            <span>{errors.nickname?.message}</span>
+            <label className="formControls_label" for="pwd">
               密碼
             </label>
             <input
-              class="formControls_input"
+              className="formControls_input"
               type="password"
               name="pwd"
               id="pwd"
@@ -86,11 +99,11 @@ const SignUpPage = () => {
               })}
             />
             <span>{errors.password?.message}</span>
-            <label class="formControls_label" for="pwd">
+            <label className="formControls_label" for="pwd">
               再次輸入密碼
             </label>
             <input
-              class="formControls_input"
+              className="formControls_input"
               type="password"
               name="pwd"
               id="pwd"
@@ -107,7 +120,7 @@ const SignUpPage = () => {
             />
             <span>{errors.comfirmPW?.message}</span>
             <input
-              class="formControls_btnSubmit"
+              className="formControls_btnSubmit"
               type="submit"
               value="註冊帳號"
             />

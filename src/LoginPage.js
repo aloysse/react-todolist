@@ -21,10 +21,16 @@ const LoginPage = () => {
       body: JSON.stringify({ user: data }),
     })
       .then((res) => {
-        setToken(res.headers.get("authorization"));
+        if (res.ok) {
+          setToken(res.headers.get("authorization"));
+          // console.log(token);
+          navigate("/todo-list");
+        } else {
+          res.json();
+          alert(res.message);
+        }
       })
-      .then((data) => navigate("/todo-list"))
-      .catch((error) => console.error(error));
+      .catch((error) => alert(error));
   };
 
   return (

@@ -28,9 +28,10 @@ const LoginPage = () => {
         } else {
           res.json();
           alert(res.message);
+          // alert("電子信箱或密碼錯誤");
         }
       })
-      .catch((error) => alert(error));
+      .catch((error) => console.error(error));
   };
 
   return (

@@ -15,14 +15,24 @@ const TodoList = () => {
       headers: { "Content-Type": "application/json", authorization: token },
     })
       .then((res) => res.json())
-      .then((data) => setTodos(data.todos))
+      .then((data) => {
+        setTodos(data.todos);
+        return data;
+      })
       .catch((error) => console.error(error));
   };
 
   useEffect(() => {
-    getTodos();
-    console.log(todos);
+    if (token) {
+      getTodos();
+    } else {
+      navigate("/");
+    }
   }, []);
+
+  useEffect(() => {
+    console.log(todos);
+  }, [todos]);
 
   // 增加 todo
   const handleAddTodo = (e) => {
@@ -33,7 +43,10 @@ const TodoList = () => {
       body: JSON.stringify({ todo: { content: inputValue } }),
     })
       .then((res) => res.json())
-      .then((data) => setInputvalue(""))
+      .then((data) => {
+        getTodos();
+        setInputvalue("");
+      })
       .catch((error) => console.error(error));
   };
 
@@ -44,6 +57,7 @@ const TodoList = () => {
       headers: { "Content-Type": "application/json", authorization: token },
     })
       .then((res) => res.json())
+      .then((data) => getTodos())
       .catch((error) => console.error(error));
   };
 
@@ -55,6 +69,7 @@ const TodoList = () => {
       headers: { "Content-Type": "application/json", authorization: token },
     })
       .then((res) => res.json())
+      .then((data) => getTodos())
       .catch((error) => console.error(error));
   };
 
@@ -125,7 +140,7 @@ const TodoList = () => {
                           className="todoList_input"
                           type="checkbox"
                           checked={item.completed_at}
-                          onChanget={() => handleChecked(item.id)}
+                          onChange={() => handleChecked(item.id)}
                         />
                         <span>{item.content}</span>
                       </label>
@@ -143,7 +158,7 @@ const TodoList = () => {
                 <p>
                   {" "}
                   {
-                    todos.filter((item) => item.completed_at !== true).length
+                    todos.filter((item) => item.completed_at == null).length
                   }{" "}
                   個待完成項目
                 </p>

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SideImage from "./components/SideImage.js";
 import { useAuth } from "./components/Context.js";
+import axios from "axios";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -14,24 +15,39 @@ const LoginPage = () => {
   const { token, setToken, API_URL } = useAuth();
 
   const onSubmit = (data) => {
+    const body = JSON.stringify({
+      user: data,
+    });
     /*登入post*/
-    fetch(API_URL + "users/sign_in", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user: data }),
+    axios({
+      method: "post",
+      url: API_URL + "users/sign_in",
+      data: body,
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/json",
+      },
     })
-      .then((res) => {
-        if (res.ok) {
-          setToken(res.headers.get("authorization"));
-          // console.log(token);
-          navigate("/todo-list");
-        } else {
-          res.json();
-          alert(res.message);
-          // alert("電子信箱或密碼錯誤");
-        }
+      .then((response) => {
+        setToken(response.headers.authorization);
+        navigate("/todo-list");
       })
-      .catch((error) => console.error(error));
+      .catch((error) => alert(error.response.data.error));
+
+    // fetch(API_URL + "users/sign_in", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     accept: "application/json",
+    //   },
+    //   body: JSON.stringify({ user: data }),
+    // })
+    //   .then((res) => {
+    //     setToken(res.headers.get("authorization"));
+    //     navigate("/todo-list");
+    //     return res.json();
+    //   })
+    //   .catch((error) => console.log(error.response.data));
   };
 
   return (

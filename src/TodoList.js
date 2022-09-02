@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./components/Context.js";
+import { useAuth, getLocalToken } from "./components/Context.js";
 
 const TodoList = () => {
   const navigate = useNavigate();
   const [todos, setTodos] = useState([]);
-  const [inputValue, setInputvalue] = useState();
+  const [inputValue, setInputvalue] = useState("");
   const { token, API_URL } = useAuth();
+  const { authorization } = getLocalToken();
 
   // 取得 todos
-  const getTodos = () => {
-    fetch(API_URL + "todos", {
+  const getTodos = async () => {
+    await fetch(API_URL + "todos", {
       method: "GET",
-      headers: { "Content-Type": "application/json", authorization: token },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: authorization,
+      },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -23,8 +27,9 @@ const TodoList = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (authorization) {
       getTodos();
+      console.log(authorization);
     } else {
       navigate("/");
     }
@@ -39,7 +44,10 @@ const TodoList = () => {
     e.preventDefault();
     fetch(API_URL + "todos", {
       method: "POST",
-      headers: { "Content-Type": "application/json", authorization: token },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: authorization,
+      },
       body: JSON.stringify({ todo: { content: inputValue } }),
     })
       .then((res) => res.json())
@@ -51,14 +59,15 @@ const TodoList = () => {
   };
 
   // 切換完成 checkbox
-  const handleChecked = (id) => {
-    fetch(API_URL + "todos/" + id + "/toggle", {
+  const handleChecked = async (id) => {
+    await fetch(API_URL + "todos/" + id + "/toggle", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", authorization: token },
-    })
-      .then((res) => res.json())
-      .then((data) => getTodos())
-      .catch((error) => console.error(error));
+      headers: {
+        "Content-Type": "application/json",
+        authorization: authorization,
+      },
+    }).then((res) => res.json());
+    await getTodos();
   };
 
   //刪除事項
@@ -66,7 +75,10 @@ const TodoList = () => {
     e.preventDefault();
     fetch(API_URL + "todos/" + id, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json", authorization: token },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: authorization,
+      },
     })
       .then((res) => res.json())
       .then((data) => getTodos())
@@ -78,10 +90,34 @@ const TodoList = () => {
     e.preventDefault();
     fetch(API_URL + "user/sign_out", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json", authorization: token },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: authorization,
+      },
     })
       .then((data) => navigate("/"))
       .catch((error) => console.error(error));
+  };
+
+  const TodoListItem = () => {
+    return todos.map((item, index) => {
+      return (
+        <li key={index}>
+          <label className="todoList_label">
+            <input
+              className="todoList_input"
+              type="checkbox"
+              checked={item.completed_at}
+              onChange={() => handleChecked(item.id)}
+            />
+            <span>{item.content}</span>
+          </label>
+          <a href="#!" onClick={(e) => handleDeletetTodo(e, item.id)}>
+            <i className="fa fa-times"></i>
+          </a>
+        </li>
+      );
+    });
   };
 
   return (
@@ -132,27 +168,13 @@ const TodoList = () => {
             </ul>
             <div className="todoList_items">
               <ul className="todoList_item">
-                {todos.map((item, index) => {
-                  return (
-                    <li key={index}>
-                      <label className="todoList_label">
-                        <input
-                          className="todoList_input"
-                          type="checkbox"
-                          checked={item.completed_at}
-                          onChange={() => handleChecked(item.id)}
-                        />
-                        <span>{item.content}</span>
-                      </label>
-                      <a
-                        href="#!"
-                        onClick={(e) => handleDeletetTodo(e, item.id)}
-                      >
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </li>
-                  );
-                })}
+                {todos.length === 0 ? (
+                  <li>
+                    <span className="todoList_label">目前尚無代辦事項</span>
+                  </li>
+                ) : (
+                  <TodoListItem />
+                )}
               </ul>
               <div className="todoList_statistics">
                 <p>

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SideImage from "./components/SideImage.js";
-import { useAuth } from "./components/Context.js";
+import { useAuth, setLocalToken } from "./components/Context.js";
 import axios from "axios";
 
 const LoginPage = () => {
@@ -29,6 +29,7 @@ const LoginPage = () => {
       },
     })
       .then((response) => {
+        setLocalToken({ authorization: response.headers.authorization });
         setToken(response.headers.authorization);
         navigate("/todo-list");
       })
@@ -47,7 +48,8 @@ const LoginPage = () => {
     //     navigate("/todo-list");
     //     return res.json();
     //   })
-    //   .catch((error) => console.log(error.response.data));
+    //   .then((resJson) => console.log(resJson))
+    //   .catch((error) => alert(error));
   };
 
   return (

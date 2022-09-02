@@ -6,8 +6,13 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-export const getLocalToken = () =>
-  JSON.parse(localStorage.getItem("authorization"));
+export const setLoacalNickname = (data) =>
+  localStorage.setItem("nickname", JSON.stringify(data));
+
+export const getLocalNickname = () =>
+  JSON.parse(localStorage.getItem("nickname"));
+
+export const getLocalToken = () => JSON.parse(localStorage.getItem("token"));
 
 export const setLocalToken = (data) =>
-  localStorage.setItem("authorization", JSON.stringify(data));
+  localStorage.setItem("token", JSON.stringify(data));

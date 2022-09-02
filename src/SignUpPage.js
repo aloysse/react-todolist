@@ -1,11 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SideImage from "./components/SideImage.js";
-import { useAuth } from "./components/Context.js";
+import {
+  useAuth,
+  setLocalToken,
+  setLoacalNickname,
+} from "./components/Context.js";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
-  const { token, setToken, API_URL } = useAuth();
+  const { API_URL } = useAuth();
 
   const {
     watch,
@@ -28,10 +32,12 @@ const SignUpPage = () => {
       body: JSON.stringify({ user: newData }),
     })
       .then((response) => {
-        setToken(response.headers.get("authorization"));
-        console.log(token);
-        //Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjciLCJzY3AiOiJ1c2VyIiwiYXVkIjpudWxsLCJpYXQiOjE2NjE4NDM4NDMsImV4cCI6MTY2MzEzOTg0MywianRpIjoiOTJmMjBlNzEtNTE2ZC00MTUzLTg3ZmMtNDk2MDExMDc5NWYwIn0.4dgHvi1djjPDfRs2zm1qBktW7f6m8ieYFSTtGmS8MoU
+        setLocalToken({ token: response.headers.get("authorization") });
         return response.json();
+      })
+      .then((data) => {
+        setLoacalNickname({ nickname: data.nickname });
+        return data;
       })
       .then((data) => alert(data.message))
       .then((data) => navigate("/todo-list"))
@@ -105,8 +111,8 @@ const SignUpPage = () => {
             <input
               className="formControls_input"
               type="password"
-              name="pwd"
-              id="pwd"
+              name="confirmPwd"
+              id="confirmPwd"
               placeholder="請再次輸入密碼"
               {...register("comfirmPW", {
                 required: { value: true, message: "此欄位不可留空" },

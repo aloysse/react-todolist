@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, getLocalToken } from "./components/Context.js";
+import {
+  useAuth,
+  getLocalToken,
+  setLocalToken,
+  getLocalNickname,
+} from "./components/Context.js";
 
 const TodoList = () => {
   const navigate = useNavigate();
   const [todos, setTodos] = useState([]);
   const [inputValue, setInputvalue] = useState("");
-  const { token, API_URL } = useAuth();
-  const { authorization } = getLocalToken();
+  const { API_URL } = useAuth();
+  const { token } = getLocalToken();
+  const { nickname } = getLocalNickname();
 
   // 取得 todos
   const getTodos = async () => {
@@ -15,7 +21,7 @@ const TodoList = () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        authorization: authorization,
+        authorization: token,
       },
     })
       .then((res) => res.json())
@@ -27,9 +33,8 @@ const TodoList = () => {
   };
 
   useEffect(() => {
-    if (authorization) {
+    if (token) {
       getTodos();
-      console.log(authorization);
     } else {
       navigate("/");
     }
@@ -46,7 +51,7 @@ const TodoList = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        authorization: authorization,
+        authorization: token,
       },
       body: JSON.stringify({ todo: { content: inputValue } }),
     })
@@ -64,7 +69,7 @@ const TodoList = () => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        authorization: authorization,
+        authorization: token,
       },
     }).then((res) => res.json());
     await getTodos();
@@ -77,7 +82,7 @@ const TodoList = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        authorization: authorization,
+        authorization: token,
       },
     })
       .then((res) => res.json())
@@ -92,13 +97,15 @@ const TodoList = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        authorization: authorization,
+        authorization: token,
       },
     })
+      .then((data) => setLocalToken(""))
       .then((data) => navigate("/"))
       .catch((error) => console.error(error));
   };
 
+  //todo list 元件
   const TodoListItem = () => {
     return todos.map((item, index) => {
       return (
@@ -124,12 +131,12 @@ const TodoList = () => {
     <div id="todoListPage" className="bg-half">
       <nav>
         <h1>
-          <a href="#!">ONLINE TODO LIST</a>
+          <a>ONLINE TODO LIST</a>
         </h1>
         <ul>
           <li className="todo_sm">
             <a href="#!">
-              <span>王小明的代辦</span>
+              <span>{nickname}的代辦</span>
             </a>
           </li>
           <li>

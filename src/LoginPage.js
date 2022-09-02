@@ -1,10 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SideImage from "./components/SideImage.js";
-import { useAuth, setLocalToken } from "./components/Context.js";
+import {
+  useAuth,
+  setLocalToken,
+  getLocalToken,
+  setLoacalNickname,
+} from "./components/Context.js";
 import axios from "axios";
+import { useEffect } from "react";
 
 const LoginPage = () => {
+  const { token } = getLocalToken();
   const navigate = useNavigate();
   const {
     register,
@@ -12,7 +19,7 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm();
 
-  const { token, setToken, API_URL } = useAuth();
+  const { API_URL } = useAuth();
 
   const onSubmit = (data) => {
     const body = JSON.stringify({
@@ -29,8 +36,11 @@ const LoginPage = () => {
       },
     })
       .then((response) => {
-        setLocalToken({ authorization: response.headers.authorization });
-        setToken(response.headers.authorization);
+        setLocalToken({ token: response.headers.authorization });
+        return response;
+      })
+      .then((response) => {
+        setLoacalNickname({ nickname: response.data.nickname });
         navigate("/todo-list");
       })
       .catch((error) => alert(error.response.data.error));
@@ -51,6 +61,14 @@ const LoginPage = () => {
     //   .then((resJson) => console.log(resJson))
     //   .catch((error) => alert(error));
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate("/todo-list");
+    } else {
+      return;
+    }
+  }, []);
 
   return (
     <div id="loginPage" className="bg-yellow">
@@ -94,9 +112,6 @@ const LoginPage = () => {
             />
             <Link className="formControls_btnLink" to="/sign-up">
               註冊帳號
-            </Link>
-            <Link className="formControls_btnLink" to="/todo-list">
-              todolist
             </Link>
           </form>
         </div>

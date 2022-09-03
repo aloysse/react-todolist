@@ -81,18 +81,25 @@ const TodoList = () => {
   };
 
   //刪除事項
-  const handleDeletetTodo = (e, id) => {
-    e.preventDefault();
-    fetch(API_URL + "todos/" + id, {
+  const handleDeletetTodo = async (id) => {
+    await fetch(API_URL + "todos/" + id, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         authorization: token,
       },
-    })
-      .then((res) => res.json())
-      .then((data) => getTodos())
-      .catch((error) => console.error(error));
+    }).then((res) => res.json());
+    await getTodos();
+  };
+
+  //清除完成事項
+  const clearCompletedItem = async () => {
+    let completedItem = todos.filter((item) => item.completed_at);
+    if (completedItem.length == 0) alert("目前沒有已完成項目");
+    for (const data of completedItem) {
+      const { id } = data;
+      await handleDeletetTodo(id);
+    }
   };
 
   //登出
@@ -163,7 +170,7 @@ const TodoList = () => {
               />
               <span>{item.content}</span>
             </label>
-            <a href="#!" onClick={(e) => handleDeletetTodo(e, item.id)}>
+            <a href="#/todo-list" onClick={(e) => handleDeletetTodo(item.id)}>
               <i className="fa fa-times"></i>
             </a>
           </li>
@@ -199,7 +206,7 @@ const TodoList = () => {
               value={inputValue}
               onChange={(e) => setInputvalue(e.target.value)}
             />
-            <a href="#!" onClick={handleAddTodo}>
+            <a href="#/todo-list" onClick={handleAddTodo}>
               <i className="fa fa-plus"></i>
             </a>
           </div>
@@ -226,7 +233,9 @@ const TodoList = () => {
                   }{" "}
                   個待完成項目
                 </p>
-                <a href="#!">清除已完成項目</a>
+                <a href="#/todo-list" onClick={clearCompletedItem}>
+                  清除已完成項目
+                </a>
               </div>
             </div>
           </div>

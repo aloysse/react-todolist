@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import SideImage from "./components/SideImage.js";
+import axios from "axios";
 import {
   useAuth,
   setLocalToken,
@@ -26,23 +27,32 @@ const SignUpPage = () => {
       nickname: data.nickname,
       password: data.password,
     };
+    const body = JSON.stringify({ user: newData });
+
     /*post 註冊資料*/
-    fetch(API_URL + "users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user: newData }),
+    // fetch(API_URL + "users", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ user: newData }),
+    // })
+    axios({
+      method: "post",
+      url: API_URL + "users",
+      data: body,
+      headers: {
+        "Content-Type": "application/json",
+        accept: "application/json",
+      },
     })
       .then((response) => {
-        setLocalToken({ token: response.headers.get("authorization") });
-        return response.json();
+        setLocalToken({ token: response.headers.authorization });
+        return response;
       })
-      .then((data) => {
-        setLoacalNickname({ nickname: data.nickname });
-        return data;
+      .then((response) => {
+        setLoacalNickname({ nickname: response.data.nickname });
+        navigate("/todo-list");
       })
-      .then((data) => alert(data.message))
-      .then((data) => navigate("/todo-list"))
-      .catch((error) => console.error(error));
+      .catch((error) => alert(error.response.data.error));
   };
 
   return (

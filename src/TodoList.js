@@ -186,7 +186,7 @@ const TodoList = () => {
         </h1>
         <ul>
           <li className="todo_sm">
-            <a href="#!">
+            <a>
               <span>{nickname}的代辦</span>
             </a>
           </li>

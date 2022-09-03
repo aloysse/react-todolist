@@ -14,6 +14,11 @@ const TodoList = () => {
   const { API_URL } = useAuth();
   const { token } = getLocalToken();
   const { nickname } = getLocalNickname();
+  const [tab, setTab] = useState([
+    { tabName: "全部", actived: true },
+    { tabName: "待完成", actived: false },
+    { tabName: "已完成", actived: false },
+  ]);
 
   // 取得 todos
   const getTodos = async () => {
@@ -41,7 +46,7 @@ const TodoList = () => {
   }, []);
 
   useEffect(() => {
-    console.log(todos);
+    // console.log(todos);
   }, [todos]);
 
   // 增加 todo
@@ -105,26 +110,65 @@ const TodoList = () => {
       .catch((error) => console.error(error));
   };
 
-  //todo list 元件
-  const TodoListItem = () => {
-    return todos.map((item, index) => {
+  //切換標籤
+  const changeTab = (tabName) => {
+    setTab(
+      tab.map((item) =>
+        item.tabName === tabName
+          ? { tabName: item.tabName, actived: true }
+          : { tabName: item.tabName, actived: false }
+      )
+    );
+  };
+
+  //標籤元件
+  const Tab = () => {
+    // console.log(tab);
+
+    return tab.map((item, index) => {
+      const { tabName, actived } = item;
       return (
         <li key={index}>
-          <label className="todoList_label">
-            <input
-              className="todoList_input"
-              type="checkbox"
-              checked={item.completed_at}
-              onChange={() => handleChecked(item.id)}
-            />
-            <span>{item.content}</span>
-          </label>
-          <a href="#!" onClick={(e) => handleDeletetTodo(e, item.id)}>
-            <i className="fa fa-times"></i>
+          <a
+            href="#/todo-list"
+            onClick={() => changeTab(tabName)}
+            className={actived ? "active" : ""}
+          >
+            {tabName}
           </a>
         </li>
       );
     });
+  };
+
+  //todo list 元件
+  const TodoListItem = ({ todos, tab }) => {
+    const TabFilter = tab.filter((item) => item.actived == true)[0].tabName;
+
+    return todos
+      .filter((item) => {
+        if (TabFilter == "全部") return item;
+        else if (TabFilter == "待完成") return item.completed_at == null;
+        else if (TabFilter == "已完成") return item.completed_at != null;
+      })
+      .map((item, index) => {
+        return (
+          <li key={index}>
+            <label className="todoList_label">
+              <input
+                className="todoList_input"
+                type="checkbox"
+                checked={item.completed_at}
+                onChange={() => handleChecked(item.id)}
+              />
+              <span>{item.content}</span>
+            </label>
+            <a href="#!" onClick={(e) => handleDeletetTodo(e, item.id)}>
+              <i className="fa fa-times"></i>
+            </a>
+          </li>
+        );
+      });
   };
 
   return (
@@ -161,27 +205,18 @@ const TodoList = () => {
           </div>
           <div className="todoList_list">
             <ul className="todoList_tab">
-              <li>
-                <a href="#!" className="active">
-                  全部
-                </a>
-              </li>
-              <li>
-                <a href="#!">待完成</a>
-              </li>
-              <li>
-                <a href="#!">已完成</a>
-              </li>
+              <Tab tab={tab} />
             </ul>
             <div className="todoList_items">
               <ul className="todoList_item">
-                {todos.length === 0 ? (
+                <TodoListItem todos={todos} tab={tab} />
+                {/* {todos.length === 0 ? (
                   <li>
                     <span className="todoList_label">目前尚無代辦事項</span>
                   </li>
                 ) : (
-                  <TodoListItem />
-                )}
+                  <TodoListItem todos={todos} tab={tab} />
+                )} */}
               </ul>
               <div className="todoList_statistics">
                 <p>

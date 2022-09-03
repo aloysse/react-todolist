@@ -64,7 +64,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (token) {
-      navigate("/todo-list");
+      // navigate("/todo-list");
     } else {
       return;
     }

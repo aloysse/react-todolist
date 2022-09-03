@@ -6,6 +6,7 @@ import {
   setLocalToken,
   setLoacalNickname,
 } from "./components/Context.js";
+import { useState } from "react";
 
 const SignUpPage = () => {
   const navigate = useNavigate();

@@ -1,5 +1,6 @@
 {
   "name": "react-todolist",
+  "homepage": "https://aloysse.github.io/react-todolist",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,7 +16,6 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
-  "homepage": "https://aloysse.github.io/react-todolist",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",

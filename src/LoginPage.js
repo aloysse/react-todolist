@@ -62,11 +62,11 @@ const LoginPage = () => {
     //   .catch((error) => alert(error));
   };
 
-  useEffect(() => {
-    if (token) {
-      navigate("/todo-list");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (token) {
+  //     navigate("/todo-list");
+  //   }
+  // }, []);
 
   return (
     <div id="loginPage" className="bg-yellow">

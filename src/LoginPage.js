@@ -4,14 +4,13 @@ import SideImage from "./components/SideImage.js";
 import {
   useAuth,
   setLocalToken,
-  getLocalToken,
   setLoacalNickname,
 } from "./components/Context.js";
 import axios from "axios";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { token } = getLocalToken();
+  // const { token } = getLocalToken();
   const navigate = useNavigate();
   const {
     register,

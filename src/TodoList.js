@@ -148,10 +148,56 @@ const TodoList = () => {
     });
   };
 
-  //todo list 元件
-  const TodoListItem = ({ todos, tab }) => {
+  //todos 元件
+  const TodoList = ({ todos, tab }) => {
     const TabFilter = tab.filter((item) => item.actived == true)[0].tabName;
+    return (
+      <ul className="todoList_item">
+        <NoItem TabFilter={TabFilter} />
+        <ToDoListItem TabFilter={TabFilter} />
+      </ul>
+    );
+  };
 
+  //零項目提示元件
+  const NoItem = ({ TabFilter }) => {
+    switch (TabFilter) {
+      case "全部":
+        if (todos.length == 0) {
+          return (
+            <li>
+              <span className="todoList_label">目前尚無待辦事項</span>
+            </li>
+          );
+        }
+        break;
+      case "待完成":
+        const notCompTodos = todos.filter((item) => item.completed_at == null);
+        if (notCompTodos.length == 0) {
+          return (
+            <li>
+              <span className="todoList_label">目前尚無待完成事項</span>
+            </li>
+          );
+        }
+        break;
+      case "已完成":
+        const compTodos = todos.filter((item) => item.completed_at != null);
+        if (compTodos.length == 0) {
+          return (
+            <li>
+              <span className="todoList_label">目前尚無完成事項</span>
+            </li>
+          );
+        }
+        break;
+      default:
+        return;
+    }
+  };
+
+  //todo 元件
+  const ToDoListItem = ({ TabFilter }) => {
     return todos
       .filter((item) => {
         if (TabFilter == "全部") return item;
@@ -215,16 +261,14 @@ const TodoList = () => {
               <Tab tab={tab} />
             </ul>
             <div className="todoList_items">
-              <ul className="todoList_item">
-                <TodoListItem todos={todos} tab={tab} />
-                {/* {todos.length === 0 ? (
+              <TodoList todos={todos} tab={tab} />
+              {/* {todos.length === 0 ? (
                   <li>
                     <span className="todoList_label">目前尚無代辦事項</span>
                   </li>
                 ) : (
                   <TodoListItem todos={todos} tab={tab} />
                 )} */}
-              </ul>
               <div className="todoList_statistics">
                 <p>
                   {" "}
